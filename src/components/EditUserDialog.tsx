@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { editUser, User } from '../features/usersSlice'
 import { addLog } from '../features/logsSlice'
+import { User } from '../types'
+import { editUser } from '../features/usersSlice'
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField, MenuItem
@@ -22,7 +23,6 @@ const EditUserDialog = ({ user, onClose }: Props) => {
   const [accessLevel, setAccessLevel] = useState(user.accessLevel)
   const [errors, setErrors] = useState<{ name?: string, accessLevel?: string }>({})
 
-  // Простая проверка имени на XSS и пустоту
   const validateName = (value: string) => {
     if (!value.trim()) return 'Имя не может быть пустым'
     if (/[<>]/.test(value) || /<script.*?>.*?<\/script>/gi.test(value)) {
@@ -31,7 +31,6 @@ const EditUserDialog = ({ user, onClose }: Props) => {
     return ''
   }
 
-  // Проверка уровня доступа от 1 до 5
   const validateAccessLevel = (value: number) => {
     if (value < 1 || value > 5) return 'Доступ должен быть от 1 до 5'
     return ''
@@ -47,9 +46,11 @@ const EditUserDialog = ({ user, onClose }: Props) => {
     }
 
     dispatch(editUser({ ...user, name, role, accessLevel }))
-    const time = new Date().toLocaleTimeString()
-    const date = new Date().toLocaleDateString()
-    dispatch(addLog(`Admin изменил пользователя ${name}: роль ${role}, доступ ${accessLevel} в ${time} ${date}`))
+    dispatch(addLog({
+      id: Date.now(),
+      message: `Admin изменил пользователя ${name}: роль ${role}, доступ ${accessLevel}`,
+      timestamp: new Date().toLocaleString()
+    }))
     onClose()
   }
 

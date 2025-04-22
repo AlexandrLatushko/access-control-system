@@ -1,16 +1,11 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import UsersPage from './pages/UsersPage'
-import LogsPage from './pages/LogsPage'
+import { useSelector } from 'react-redux'
+import { RootState } from './store'
+import LoginPage from './components/LoginPage'
+import MainApp from './components/MainApp'
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<UsersPage />} />
-        <Route path="/logs" element={<LogsPage />} />
-      </Routes>
-    </BrowserRouter>
-  )
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
+  return isAuthenticated ? <MainApp /> : <LoginPage />
 }
 
 export default App

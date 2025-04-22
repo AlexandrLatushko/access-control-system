@@ -1,5 +1,5 @@
 import Layout from '../components/Layout'
-import Logs from '../components/Logs'
+import Logs from '../components/LogsList'
 
 const LogsPage = () => {
   return (

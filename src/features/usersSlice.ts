@@ -1,25 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { User } from '../types'
 
-type User = {
-  id: number
-  name: string
-  email: string
-  role: string
-  accessLevel: number
-}
-
-type UsersState = {
+interface UsersState {
   users: User[]
 }
 
 const initialState: UsersState = {
   users: [
-    { id: 1, name: 'Иванов Иван', email: 'ivanov@mail.ru', role: 'Оператор', accessLevel: 3 },
-    { id: 2, name: 'Петров Петр', email: 'petrov@mail.ru', role: 'Аналитик', accessLevel: 2 },
+    { id: 1, name: 'Иван', email: 'ivan@mail.ru', role: 'Аналитик', accessLevel: 3 },
+    { id: 2, name: 'Петя', email: 'petr@mail.ru', role: 'Оператор', accessLevel: 2 },
   ],
 }
 
-export const usersSlice = createSlice({
+const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
@@ -37,4 +30,3 @@ export const usersSlice = createSlice({
 
 export const { editUser, deleteUser } = usersSlice.actions
 export default usersSlice.reducer
-export type { User }

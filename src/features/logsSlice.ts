@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { Log } from '../types'
 
-type Log = string
-
-type LogsState = {
+interface LogsState {
   logs: Log[]
 }
 
@@ -10,12 +9,12 @@ const initialState: LogsState = {
   logs: [],
 }
 
-export const logsSlice = createSlice({
+const logsSlice = createSlice({
   name: 'logs',
   initialState,
   reducers: {
     addLog: (state, action: PayloadAction<Log>) => {
-      state.logs.unshift(action.payload)
+      state.logs.push(action.payload)
     },
   },
 })
