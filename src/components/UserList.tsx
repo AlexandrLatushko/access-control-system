@@ -1,20 +1,23 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '../store'
+import { RootState } from '../app/store'
 import { editUser, deleteUser } from '../features/usersSlice'
 import { addLog } from '../features/logsSlice'
 import { User } from '../types'
 import { Table, TableBody, TableCell, TableHead, TableRow, TextField, Select, MenuItem, Button } from '@mui/material'
 import DOMPurify from 'dompurify'
 import { useState, useEffect } from 'react'
+import {
+  getUserChanges,
+  isAccessLevelValid,
+  isNameValid,
+  createLogMessage
+} from '../utils/userUtils'
 
 const UserList = () => {
   const users = useSelector((state: RootState) => state.users.users)
   const dispatch = useDispatch()
-
-  // Локальный стейт для формы
   const [localUsers, setLocalUsers] = useState<User[]>([])
 
-  // При загрузке или изменении users — обновляем локальный стейт
   useEffect(() => {
     setLocalUsers(users)
   }, [users])
@@ -32,34 +35,21 @@ const UserList = () => {
   const handleSave = (user: User) => {
     const originalUser = users.find(u => u.id === user.id)
     if (!originalUser) return
-  
-    if (!user.name.trim()) {
+
+    if (!isNameValid(user.name)) {
       alert('Имя не может быть пустым')
       return
     }
-  
-    if (user.accessLevel < 1 || user.accessLevel > 5) {
+
+    if (!isAccessLevelValid(user.accessLevel)) {
       alert('Уровень доступа должен быть от 1 до 5')
       return
     }
-  
-    // Собираем сообщения о изменениях
-    const changes: string[] = []
-  
-    if (user.name !== originalUser.name) {
-      changes.push(`имя пользователя с "${originalUser.name}" на "${user.name}"`)
-    }
-  
-    if (user.role !== originalUser.role) {
-      changes.push(`роль пользователя ${user.name} с "${originalUser.role}" на "${user.role}"`)
-    }
-  
-    if (user.accessLevel !== originalUser.accessLevel) {
-      changes.push(`уровень доступа пользователя ${user.name} с ${originalUser.accessLevel} на ${user.accessLevel}`)
-    }
-  
+
+    const changes = getUserChanges(originalUser, user)
+
     if (changes.length > 0) {
-      const logMessage = `Admin изменил ${changes.join(', ')} в ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`
+      const logMessage = createLogMessage(changes)
       dispatch(
         addLog({
           id: Date.now(),
@@ -68,10 +58,23 @@ const UserList = () => {
         })
       )
     }
-    // Обновляем пользователя
+
     dispatch(editUser(user))
   }
-  
+
+  const handleDelete = (user: User) => {
+    const logMessage = `Admin удалил пользователя "${user.name}" (${user.email}) в ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`
+
+    dispatch(deleteUser(user.id))
+    dispatch(
+      addLog({
+        id: Date.now(),
+        message: logMessage,
+        timestamp: new Date().toLocaleString(),
+      })
+    )
+  }
+
   return (
     <Table>
       <TableHead>
@@ -111,8 +114,8 @@ const UserList = () => {
               />
             </TableCell>
             <TableCell>
-              <Button onClick={() => handleSave(user)}>Сохранить</Button>
-              <Button onClick={() => dispatch(deleteUser(user.id))}>Удалить</Button>
+              <Button color="success" onClick={() => handleSave(user)}>Сохранить</Button>
+              <Button color="error" onClick={() => handleDelete(user)}>Удалить</Button>
             </TableCell>
           </TableRow>
         ))}

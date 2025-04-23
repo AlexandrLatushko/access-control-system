@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux'
-import { RootState } from '../store'
+import { RootState } from '../app/store'
 import { Typography, List, ListItem } from '@mui/material'
 
 const LogsList = () => {
@@ -7,10 +7,10 @@ const LogsList = () => {
 
   return (
     <>
-      <Typography variant="h5" mt={4}>Логи действий</Typography>
+      <Typography variant="h5" mt={10}>Логи действий</Typography>
       <List>
         {logs.map(log => (
-          <ListItem key={log.id}>{log.timestamp} — {log.message}</ListItem>
+          <ListItem key={log.id}> {log.message}</ListItem>
         ))}
       </List>
     </>

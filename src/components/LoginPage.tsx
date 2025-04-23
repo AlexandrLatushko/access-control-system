@@ -9,6 +9,14 @@ const LoginPage = () => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value)
+  }
+  
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value)
+  }
+
   const handleLogin = () => {
     if (username === 'admin' && password === '123456') {
       dispatch(login())
@@ -19,10 +27,10 @@ const LoginPage = () => {
 
   return (
     <Container maxWidth="xs">
-      <Box display="flex" flexDirection="column" gap={2} mt={10}>
+      <Box display="flex" flexDirection="column" gap={4} mt={14}>
         <Typography variant="h5">Вход в систему</Typography>
-        <TextField label="Логин" value={username} onChange={(e) => setUsername(e.target.value)} />
-        <TextField label="Пароль" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <TextField label="Логин" value={username} onChange={handleUsernameChange} />
+        <TextField label="Пароль" type="password" value={password} onChange={handlePasswordChange} />
         {error && <Typography color="error">{error}</Typography>}
         <Button variant="contained" onClick={handleLogin}>Войти</Button>
       </Box>
