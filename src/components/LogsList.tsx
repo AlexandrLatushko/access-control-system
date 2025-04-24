@@ -10,7 +10,7 @@ const LogsList = () => {
       <Typography variant="h5" mt={10}>Логи действий</Typography>
       <List>
         {logs.map(log => (
-          <ListItem key={log.id}>{log.timestamp} — {log.message}</ListItem>
+          <ListItem key={log.id}>{log.message}</ListItem>
         ))}
       </List>
     </>
