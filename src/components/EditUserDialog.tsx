@@ -8,8 +8,8 @@ import {
 } from '@mui/material'
 import DOMPurify from 'dompurify'
 import { nanoid } from 'nanoid'
-import { isNameValid, isAccessLevelValid } from '../utils/userUtils'
 import { updateUser } from '../features/usersSlice'
+import { getUserChanges, isAccessLevelValid, isNameValid, createLogMessage } from '../utils/userUtils'
 
 const roles = ['Аналитик', 'Оператор', 'Администратор']
 
@@ -28,7 +28,8 @@ const EditUserDialog = ({ user, onClose }: Props) => {
 
   const handleSave = () => {
     const cleanName = DOMPurify.sanitize(name)
-    const nameError = isNameValid(cleanName) ? '' : 'Некорректный ввод!'
+
+    const nameError = isNameValid(cleanName) ? '' : 'Имя не может быть пустым'
     const accessLevelError = isAccessLevelValid(accessLevel) ? '' : 'Доступ должен быть от 1 до 5'
 
     if (nameError || accessLevelError) {
@@ -36,12 +37,18 @@ const EditUserDialog = ({ user, onClose }: Props) => {
       return
     }
 
-    dispatch(updateUser({ ...user, name: cleanName, role, accessLevel }))
-    dispatch(addLog({
-      id: nanoid(),
-      message: `Admin изменил пользователя ${cleanName}: роль ${role}, доступ ${accessLevel}`,
-      timestamp: new Date().toLocaleString()
-    }))
+    const updatedUser = { ...user, name: cleanName, role, accessLevel }
+    dispatch(updateUser(updatedUser))
+
+    const changes = getUserChanges(user, updatedUser)
+    if (changes.length > 0) {
+      dispatch(addLog({
+        id: nanoid(),
+        message: createLogMessage(changes),
+        timestamp: new Date().toLocaleString()
+      }))
+    }
+
     onClose()
   }
 

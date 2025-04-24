@@ -1,4 +1,3 @@
-// src/components/NewUserRow.tsx
 import { useDispatch } from 'react-redux'
 import { useState } from 'react'
 import { addUser } from '../features/usersSlice'
@@ -7,9 +6,10 @@ import { User } from '../types'
 import { TableRow, TableCell, TextField, Button, MenuItem } from '@mui/material'
 import { nanoid } from 'nanoid'
 import DOMPurify from 'dompurify'
+import { isNameValid, isAccessLevelValid, isEmailValid } from '../utils/userUtils'
+
 
 const roles: User['role'][] = ['Аналитик', 'Оператор', 'Администратор']
-const emailRegex = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/
 
 const NewUserRow = () => {
   const dispatch = useDispatch()
@@ -21,17 +21,12 @@ const NewUserRow = () => {
 
   const handleAdd = () => {
     const cleanName = DOMPurify.sanitize(name)
-
-    if (!cleanName.trim() || !email.trim()) {
-      alert('Пустые поля или введенные некорректные данные')
+  
+    if (!isNameValid(cleanName) || !isEmailValid(email) || !isAccessLevelValid(accessLevel)) {
+      alert('Проверьте правильность ввода имени, email и уровня доступа')
       return
     }
-
-    if (!emailRegex.test(email)) {
-      setEmailError('Некорректный email')
-      return
-    }
-
+  
     const newUser: User = {
       id: nanoid(),
       name: cleanName,
@@ -39,20 +34,19 @@ const NewUserRow = () => {
       role,
       accessLevel
     }
-
+  
     dispatch(addUser(newUser))
     dispatch(addLog({
       id: nanoid(),
       message: `Добавлен пользователь ${cleanName} (${email})`,
       timestamp: new Date().toLocaleString()
     }))
-
+  
     setName('')
     setEmail('')
     setAccessLevel(1)
-    setEmailError('')
   }
-
+  
   return (
     <TableRow>
       <TableCell>

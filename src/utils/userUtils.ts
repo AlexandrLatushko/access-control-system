@@ -22,6 +22,7 @@ export const isNameValid = (name: string): boolean => !!name.trim()
 
 export const isAccessLevelValid = (level: number): boolean => level >= 1 && level <= 5
 
-export const createLogMessage = (changes: string[]): string => {
-  return `Admin изменил ${changes.join(', ')} в ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`
-}
+export const isEmailValid = (email: string): boolean => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
+
+export const createLogMessage = (changes: string[]): string =>
+  `Admin изменил ${changes.join(', ')} в ${new Date().toLocaleTimeString()} ${new Date().toLocaleDateString()}`
