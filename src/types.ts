@@ -1,13 +1,13 @@
 export type User = {
-    id: number
+    id: string
     name: string
     email: string
-    role: string
+    role: 'Аналитик' | 'Оператор' | 'Администратор'
     accessLevel: number
   }
   
   export type Log = {
-    id: number
+    id: string
     message: string
     timestamp: string
   }

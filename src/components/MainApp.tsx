@@ -1,4 +1,4 @@
-import { Container, Button, Typography } from '@mui/material'
+import { Container, Button, Typography, Box } from '@mui/material'
 import UserList from './UserList'
 import { useDispatch } from 'react-redux'
 import { logout } from '../features/authSlice'
@@ -9,8 +9,12 @@ const MainApp = () => {
 
   return (
     <Container>
-      <Typography variant="h4" mt={2}>Панель управления доступом</Typography>
-      <Button variant="contained" color="secondary" onClick={() => dispatch(logout())} sx={{ mt: 2 }}>Выйти</Button>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mt={4} mb={4}>
+        <Typography variant="h4">Панель управления доступом</Typography>
+        <Button variant="outlined" color="info" onClick={() => dispatch(logout())}>
+          Выйти
+        </Button>
+      </Box>
       <UserList />
       <LogsList />
     </Container>

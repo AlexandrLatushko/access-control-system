@@ -2,11 +2,14 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { addLog } from '../features/logsSlice'
 import { User } from '../types'
-import { editUser } from '../features/usersSlice'
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField, MenuItem
 } from '@mui/material'
+import DOMPurify from 'dompurify'
+import { nanoid } from 'nanoid'
+import { isNameValid, isAccessLevelValid } from '../utils/userUtils'
+import { updateUser } from '../features/usersSlice'
 
 const roles = ['Аналитик', 'Оператор', 'Администратор']
 
@@ -23,32 +26,20 @@ const EditUserDialog = ({ user, onClose }: Props) => {
   const [accessLevel, setAccessLevel] = useState(user.accessLevel)
   const [errors, setErrors] = useState<{ name?: string, accessLevel?: string }>({})
 
-  const validateName = (value: string) => {
-    if (!value.trim()) return 'Имя не может быть пустым'
-    if (/[<>]/.test(value) || /<script.*?>.*?<\/script>/gi.test(value)) {
-      return 'Имя содержит недопустимые символы'
-    }
-    return ''
-  }
-
-  const validateAccessLevel = (value: number) => {
-    if (value < 1 || value > 5) return 'Доступ должен быть от 1 до 5'
-    return ''
-  }
-
   const handleSave = () => {
-    const nameError = validateName(name)
-    const accessLevelError = validateAccessLevel(accessLevel)
+    const cleanName = DOMPurify.sanitize(name)
+    const nameError = isNameValid(cleanName) ? '' : 'Некорректный ввод!'
+    const accessLevelError = isAccessLevelValid(accessLevel) ? '' : 'Доступ должен быть от 1 до 5'
 
     if (nameError || accessLevelError) {
       setErrors({ name: nameError, accessLevel: accessLevelError })
       return
     }
 
-    dispatch(editUser({ ...user, name, role, accessLevel }))
+    dispatch(updateUser({ ...user, name: cleanName, role, accessLevel }))
     dispatch(addLog({
-      id: Date.now(),
-      message: `Admin изменил пользователя ${name}: роль ${role}, доступ ${accessLevel}`,
+      id: nanoid(),
+      message: `Admin изменил пользователя ${cleanName}: роль ${role}, доступ ${accessLevel}`,
       timestamp: new Date().toLocaleString()
     }))
     onClose()
@@ -65,7 +56,7 @@ const EditUserDialog = ({ user, onClose }: Props) => {
           onChange={(e) => {
             setName(e.target.value)
             if (errors.name) {
-              setErrors({ ...errors, name: validateName(e.target.value) })
+              setErrors({ ...errors, name: '' })
             }
           }}
           error={Boolean(errors.name)}
@@ -78,7 +69,7 @@ const EditUserDialog = ({ user, onClose }: Props) => {
           select
           fullWidth
           value={role}
-          onChange={(e) => setRole(e.target.value)}
+          onChange={(e) => setRole(e.target.value as User['role'])}
           margin="normal"
         >
           {roles.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
@@ -90,9 +81,10 @@ const EditUserDialog = ({ user, onClose }: Props) => {
           fullWidth
           value={accessLevel}
           onChange={(e) => {
-            setAccessLevel(Number(e.target.value))
+            const value = Number(e.target.value)
+            setAccessLevel(value)
             if (errors.accessLevel) {
-              setErrors({ ...errors, accessLevel: validateAccessLevel(Number(e.target.value)) })
+              setErrors({ ...errors, accessLevel: '' })
             }
           }}
           error={Boolean(errors.accessLevel)}
