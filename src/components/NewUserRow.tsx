@@ -38,7 +38,7 @@ const NewUserRow = () => {
     dispatch(addUser(newUser))
     dispatch(addLog({
       id: nanoid(),
-      message: `Добавлен пользователь ${cleanName} (${email})`,
+      message: `Добавлен пользователь ${cleanName} (${email} в ${new Date().toLocaleString()})`,
       timestamp: new Date().toLocaleString()
     }))
   
