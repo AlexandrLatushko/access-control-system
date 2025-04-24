@@ -19,7 +19,7 @@ const UserRow = ({ user }: Props) => {
     dispatch(deleteUser(user.id))
     dispatch(addLog({
       id: nanoid(),
-      message: `Admin удалил пользователя ${user.name}`,
+      message: `Admin удалил пользователя ${user.name} в ${new Date().toLocaleString()}`,
       timestamp: new Date().toLocaleString()
     }))
   }
